@@ -42,7 +42,7 @@ function VideoList() {
     return (
         <div>
             <h2>Hello, Video List</h2>
-            <table>
+            <table className="table-content">
                     <thead>
                         <tr>
                             <th>Status</th>
@@ -61,7 +61,7 @@ function VideoList() {
                         </tr>
                     </thead>
 
-                    <tbody>
+                    <tbody className="table-body">
                         {videos.map((video) => {
                             const firstRelease = video.releases && video.releases.length > 0 ? video.releases[0] : null;
                             const secondRelease = video.releases && video.releases.length > 0 ? video.releases[1] : null;

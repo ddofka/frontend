@@ -8,9 +8,18 @@ th, td {
     padding: 8px;
     text-align: left;
 }
-tr {background-color: #f2f2f2;}
-.editor-color-0 { background-color: #DE7C5A; }
-.editor-color-1 { background-color: #E1B07E; }
-.editor-color-2 { background-color: #95A78D; }
-.editor-color-3 { background-color: #BD897E; }
-.editor-color-4 { background-color: #F87666; }
+tr {background-color: #FFFCF9;}
+.table-content {
+    font-family: 'Helvetica', sans-serif;
+    font-size: 12px;
+}
+.table-body {
+    font-weight: 500; /* or bold, 500, 600, etc. */
+    font-family: "Inter", sans-serif;
+    color: #1a1a1a; /* dark gray */
+}
+.editor-color-0 { background-color: #8EE7CF; }
+.editor-color-1 { background-color: #F4E5C2; }
+.editor-color-2 { background-color: #90B0CB; }
+.editor-color-3 { background-color: #A37B73; }
+.editor-color-4 { background-color: #DB7F67; }
