@@ -1,0 +1,16 @@
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+}
+tr {background-color: #f2f2f2;}
+.editor-color-0 { background-color: #DE7C5A; }
+.editor-color-1 { background-color: #E1B07E; }
+.editor-color-2 { background-color: #95A78D; }
+.editor-color-3 { background-color: #BD897E; }
+.editor-color-4 { background-color: #F87666; }
