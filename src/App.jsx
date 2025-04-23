@@ -1,13 +1,43 @@
 import { useState, useEffect } from 'react';
 import Login from './Login';
 import VideoList from './VideoList';
+import axiosInstance from "./axiosInstance.js";
 
 function App() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-    useEffect(() => {
+    // Function to check token validity
+    const checkTokenValidity = () => {
         const token = localStorage.getItem('token');
-        setIsLoggedIn(!!token); // true if token exists
+
+        if (!token) {
+            setIsLoggedIn(false);
+            return;
+        }
+
+        axiosInstance.get('http://localhost:8080/api/videos?page=0&size=1')
+            .then(() => {
+                setIsLoggedIn(true); // token valid
+            })
+            .catch((error) => {
+                console.warn('Token ping failed:', error);
+                localStorage.removeItem('token');
+                setIsLoggedIn(false);
+                window.location.href = '/'; // force immediate redirect
+            });
+    };
+
+    useEffect(() => {
+        // Initial token check
+        checkTokenValidity();
+
+        // Set up periodic token check (every 2 minutes)
+        const tokenCheckInterval = setInterval(() => {
+            checkTokenValidity();
+        }, 1000 * 60 * 60 * 8); // 8 hours in milliseconds
+
+        // Cleanup interval on component unmount
+        return () => clearInterval(tokenCheckInterval);
     }, []);
 
     const handleLoginSuccess = () => {
@@ -20,11 +50,13 @@ function App() {
     };
 
     return (
-        <div>
-            <h1>Production Plan App</h1>
+        <div className="app">
             {isLoggedIn ? (
                 <>
-                    <button onClick={handleLogout}>Log Out</button>
+                    <div className="header">
+                        <h1>Production Plan App</h1>
+                        <button className={"logout"} onClick={handleLogout}>Log Out</button>
+                    </div>
                     <VideoList />
                 </>
             ) : (

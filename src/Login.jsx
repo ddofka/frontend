@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
+import './Login.css';
 
 function Login({ onLoginSuccess }) {
 
@@ -19,8 +20,6 @@ function Login({ onLoginSuccess }) {
                 localStorage.setItem('token', token); // save token for other components
                 setError('');
                 onLoginSuccess(); // tell App to switch
-                alert('Login successful!');
-                // optionally redirect or lift state later
             })
             .catch((err) => {
                 console.error('Login error:', err);
@@ -29,24 +28,25 @@ function Login({ onLoginSuccess }) {
     };
 
     return (
-        <div>
-            <h2>Login</h2>
-            <form onSubmit={handleLogin}>
-                <input
-                    type="text"
-                    placeholder="Username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                /><br />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                /><br />
-                <button type="submit">Log In</button>
-                {error && <p style={{ color: 'red' }}>{error}</p>}
-            </form>
+        <div className="login-page">
+            <div className="login">
+                {error && <p>Access denied, but points for creativity.</p>}
+                <form onSubmit={handleLogin}>
+                    <input
+                        type="text"
+                        placeholder="Username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                    />
+                    <input
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
+                    <button type="submit">log-in</button>
+                </form>
+            </div>
         </div>
     );
 }

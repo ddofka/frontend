@@ -1,94 +1,277 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import axiosInstance from './axiosInstance';
 import './VideoList.css';
+import {
+    useReactTable,
+    getCoreRowModel,
+    getSortedRowModel,
+    flexRender
+} from '@tanstack/react-table';
 
 const editorColorMap = {};
 let nextColorIndex = 0;
 const colorClassCount = 5;
 
-function VideoList() {
+const columns = [
+    {
+        accessorKey: 'status',
+        header: 'Status',
+        cell: ({ getValue }) => {
+            const status = getValue();
+            return <span className={`tag tag-${status.toLowerCase()}`}>{status}</span>;
+        },
+        meta: {
+            headerAlign: 'center',
+            align: 'center'
+        }
+    },
+    {
+        accessorKey: 'stage',
+        header: 'Stage',
+        cell: ({ getValue }) => {
+            const stage = getValue();
+            return <span className={`tag tag-${stage.toLowerCase()}`}>{stage}</span>;
+        },
+        meta: {
+            headerAlign: 'center',
+            align: 'center'
+        }
+    },
+    {
+        accessorKey: 'priority',
+        header: 'Priority',
+        cell: ({ getValue }) => {
+            const priority = getValue();
+            return <span className={`tag tag-${priority.toLowerCase()}`}>{priority}</span>;
+        },
+        meta: {
+            headerAlign: 'right',
+            align: 'right'
+        }
+    },
+    {
+        accessorKey: 'compilationName',
+        header: 'Compilation Name',
+    },
+    {
+        accessorKey: 'director.name',
+        header: 'Director',
+        meta: {
+            headerAlign: 'center',
+            align: 'center'
+        }
+    },
+    {
+        accessorKey: 'editor.name',
+        header: 'Editor',
+        meta: {
+            headerAlign: 'center',
+            align: 'center'
+        }
+    },
+    {
+        accessorKey: 'filmingStart',
+        header: 'Filming Start',
+        meta: {
+            headerAlign: 'center',
+            align: 'center'
+        }
+    },
+    {
+        accessorKey: 'editStart',
+        header: 'Edit Start',
+        meta: {
+            headerAlign: 'center',
+            align: 'center'
+        }
+    },
+    {
+        header: 'Release #1',
+        cell: ({ row }) => {
+            const release = row.original.releases?.[0];
+            return release ? formatDate(release.releaseDateTime) : '-';
+        },
+        meta: {
+            headerAlign: 'center',
+            align: 'center'
+        }
+    },
+    {
+        header: 'Release #2',
+        cell: ({ row }) => {
+            const release = row.original.releases?.[1];
+            return release ? formatDate(release.releaseDateTime) : '-';
+        },
+        meta: {
+            headerAlign: 'center',
+            align: 'center'
+        }
+    },
+    {
+        header: 'Release #3',
+        cell: ({ row }) => {
+            const release = row.original.releases?.[2];
+            return release ? formatDate(release.releaseDateTime) : '-';
+        },
+        meta: {
+            headerAlign: 'center',
+            align: 'center'
+        }
+    },
+    {
+        accessorKey: 'referenceLink',
+        header: 'Reference',
+        cell: ({ getValue }) => {
+            const url = getValue();
+            if (!url) return '-';
+
+            return (
+                <a href={url} target="_blank" rel="noopener noreferrer">
+                    Watch
+                </a>
+            );
+        },
+        meta: {
+            headerAlign: 'center',
+            align: 'center'
+        }
+    },
+    {
+        accessorKey: 'comment',
+        header: 'Reference Title'
+    },
+];
+
+const getEditorClass = (name) => {
+    if (!name) return 'editor-color-0';
+    if (!(name in editorColorMap)) {
+        editorColorMap[name] = nextColorIndex;
+        nextColorIndex = (nextColorIndex + 1) % colorClassCount;
+    }
+    const classIndex = editorColorMap[name];
+    return `editor-color-${classIndex}`;
+};
+
+const formatDate = (dateStr) => {
+    if (!dateStr) return '-';
+    const date = new Date(dateStr);
+    return new Intl.DateTimeFormat('lt-LT', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+    }).format(date);
+};
+
+function VideoTable() {
     const [videos, setVideos] = useState([]);
+    const [pagination, setPagination] = useState({
+        pageIndex: 0,
+        pageSize: 10,
+    });
+    const [pageCount, setPageCount] = useState(0);
+    const [totalVideos, setTotalVideos] = useState(0);
+    const emptyRowsCount = Math.max(0, pagination.pageSize - videos.length);
+    const emptyRows = Array(emptyRowsCount).fill(null);
 
     useEffect(() => {
         const token = localStorage.getItem('token');
-        if (!token) {
-            console.warn('No token found — user may not be logged in');
-            return;
-        }
-        axios.get('http://localhost:8080/api/videos?page=0&size=20&sort=id,desc',{
+        const { pageIndex, pageSize } = pagination;
+
+        if (!token) return;
+
+        axiosInstance.get(`http://localhost:8080/api/videos?page=${pageIndex}&size=${pageSize}&sort=id,desc`, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
-            })
-            .then((response) => {
-                console.log('API response:', response.data);
-                setVideos(response.data.content);
-            })
-        .catch((error) => {
-            console.error('Error fetching videos:', error);
         })
-    },[])
+            .then((response) => {
+                setVideos(response.data.content);
+                setPageCount(response.data.page.totalPages)
+                setTotalVideos(response.data.page.totalElements);
+            })
+    }, [pagination]);
 
-    const getEditorClass = (name) => {
-        if (!name) return 'editor-color-0';
-        if (!(name in editorColorMap)) {
-            editorColorMap[name] = nextColorIndex;
-            nextColorIndex = (nextColorIndex + 1) % colorClassCount;
-        }
-        const classIndex = editorColorMap[name];
-        return `editor-color-${classIndex}`;
-    };
+    const table = useReactTable({
+        data: videos, columns,
+        getCoreRowModel: getCoreRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        state: {
+            pagination,
+        },
+        pageCount,
+        manualPagination: true,
+        onPaginationChange: setPagination,
+    });
+
+    const currentPage = pagination.pageIndex;
+    const itemsPerPage = pagination.pageSize;
+
+    const highestItemOnPage = totalVideos - (currentPage * itemsPerPage);
+    const lowestItemOnPage = Math.max(1, highestItemOnPage - videos.length + 1);
 
     return (
-        <div>
-            <h2>Hello, Video List</h2>
-            <table className="table-content">
-                    <thead>
-                        <tr>
-                            <th>Status</th>
-                            <th>Stage</th>
-                            <th>Priority</th>
-                            <th>Compilation Name</th>
-                            <th>Director</th>
-                            <th>Editor</th>
-                            <th>Filming Start</th>
-                            <th>Edit Start</th>
-                            <th>Post Date 1</th>
-                            <th>Post Date 2</th>
-                            <th>Post Date 3</th>
-                            <th>Reference Link</th>
-                            <th>Reference Title</th>
-                        </tr>
-                    </thead>
+        <>
+        <div className="table-container">
+        <table className="table-content">
+            <thead>
+            {table.getHeaderGroups().map(headerGroup => (
+                <tr key={headerGroup.id}>
+                    {headerGroup.headers.map(header => (
+                        <th key={header.id}
+                            style={{ textAlign: header.column.columnDef.meta?.headerAlign || 'left' }}
+                        >
+                            {flexRender(header.column.columnDef.header, header.getContext())}
+                        </th>
+                    ))}
+                </tr>
+            ))}
+            </thead>
+            <tbody className="table-body">
+                {table.getRowModel().rows.map(row => {
+                    const editorName = row.original.editor.name;
+                    const rowClass = getEditorClass(editorName);
 
-                    <tbody className="table-body">
-                        {videos.map((video) => {
-                            const firstRelease = video.releases && video.releases.length > 0 ? video.releases[0] : null;
-                            const secondRelease = video.releases && video.releases.length > 0 ? video.releases[1] : null;
-                            const thirdRelease = video.releases && video.releases.length > 0 ? video.releases[2] : null;
-                            return(
-                        <tr key={video.id} className={getEditorClass(video.editor.name)}>
-                            <td>{video.status}</td>
-                            <td>{video.stage}</td>
-                            <td>{video.priority}</td>
-                            <td>{video.compilationName}</td>
-                            <td>{video.director.name}</td>
-                            <td>{video.editor.name}</td>
-                            <td>{video.filmingStart}</td>
-                            <td>{video.editStart}</td>
-                            <td>{firstRelease && `"${firstRelease.releaseDateTime}"`}</td>
-                            <td>{secondRelease && `"${secondRelease.releaseDateTime}"`}</td>
-                            <td>{thirdRelease && `"${thirdRelease.releaseDateTime}"`}</td>
-                            <td>{video.referenceLink}</td>
-                            <td>{video.comment}</td>
-                        </tr>
-                        );
-                        })}
-                    </tbody>
+                    return (
+                    <tr key={row.id} className={rowClass}>
+                {row.getVisibleCells().map(cell => (
+                    <td
+                        key={cell.id}
+                        style={{ textAlign: cell.column.columnDef.meta?.align || 'left' }}
+                    >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </td>
+                ))}
+                </tr>
+                );
+                })}
+                {emptyRows.map((_, index) => (
+                    <tr key={`empty-row-${index}`} className="empty-row">
+                        <td colSpan={columns.length}>&nbsp;</td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+            <div className="pagination-controls">
+                <div className="pagination-info">
+                    <p>Showing {highestItemOnPage}–{lowestItemOnPage} of {totalVideos}</p>
+                </div>
 
-            </table>
+                <div className="pagination-buttons">
+                    <button onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
+                        Previous
+                    </button>
+                    <span>
+                      Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+                    </span>
+                    <button onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+                        Next
+                    </button>
+                </div>
+            </div>
         </div>
+        </>
     );
 }
-
-export default VideoList;
+export default VideoTable;

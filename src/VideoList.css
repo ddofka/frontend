@@ -1,25 +1,182 @@
-table {
-    width: 100%;
-    border-collapse: collapse;
+.table-container {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(40px * 10 + 37px);
 }
 
+thead {
+    height: 37px;
+}
+
+tbody.table-body tr {
+    height: 40px;
+}
+.empty-row {
+    height: 40px;
+    background-color: #f6f6f6;
+}
+.empty-row td {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+th{background-color: rgb(251, 251, 251);}
+table {
+    width: 100%;
+    border-collapse: separate;
+    margin-right: auto;
+    margin-left: auto;
+    overflow: hidden;
+    border-radius: 10px;
+    border-spacing: 0;
+    box-shadow: 0 40px 0 rgb(251, 251, 251);
+}
+h1{text-align: center; color: #5a5e61; font-family: 'Futura', sans-serif;}
+h2{text-align: center;}
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+}
+.logout{
+    box-shadow: none;
+    border: none;
+    font-family: 'Futura', sans-serif;
+    font-size: 13px;
+    color: black;
+    background-color: #fff000;
+}
+.logout:hover {
+    background-color: rgb(0, 0, 0);
+    color: #fff;
+}
+
+.header h1 {
+    margin: auto;
+    font-size: 1.5rem;
+}
+
+.header button {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border-radius: 10px;
+}
 th, td {
-    border: 1px solid #ccc;
     padding: 8px;
     text-align: left;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05); /* very light gray gridlines */
+    border-top: none;
+    border-left: none;
+    border-right: none;
 }
-tr {background-color: #FFFCF9;}
 .table-content {
-    font-family: 'Helvetica', sans-serif;
-    font-size: 12px;
+    font-family: 'Futura', sans-serif;
+    font-size: 13px;
 }
 .table-body {
     font-weight: 500; /* or bold, 500, 600, etc. */
-    font-family: "Inter", sans-serif;
+    font-family: "Roboto", sans-serif;
     color: #1a1a1a; /* dark gray */
 }
-.editor-color-0 { background-color: #8EE7CF; }
-.editor-color-1 { background-color: #F4E5C2; }
-.editor-color-2 { background-color: #90B0CB; }
-.editor-color-3 { background-color: #A37B73; }
-.editor-color-4 { background-color: #DB7F67; }
+.editor-color-0 { background-color: #F0E9F9; } /* light lavender (not clashing with purple tag) */
+.editor-color-1 { background-color: #F0F4FB; } /* icy blue-gray, neutral and crisp */
+.editor-color-2 { background-color: #FFF8EB; } /* warm cream (avoids orange clash) */
+.editor-color-3 { background-color: #EDF8F3; } /* mint-tinted, soft & distinct from tags */
+.editor-color-4 { background-color: #F8F2FC; } /* pastel lilac (light, elegant, different hue) */
+
+.tag {
+    padding: 0 6px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: white;
+    margin-right: -8px;
+    margin-left: -8px;
+}
+.tag-canceled {background-color: #f8bcbc; color: #842029;}
+
+.tag-prep {background-color: #dcdcdc; color: #3f3f3f;}
+
+.tag-refilm {
+    background-color: #ffd59e;  /* mellow orange */
+    color: #924c00;
+}
+
+.tag-done_filming {
+    background-color: #42d15a;  /* soft green */
+    color: #fff;
+}
+
+.tag-filming {
+    background-color: #fff7b3;  /* mellow yellow */
+    color: #6a5e00;
+}
+.tag-editing {
+    background-color: #95ddd0;  /* mellow yellow */
+    color: #fff;
+}
+.tag-testing {
+    background-color: #d1ffb3;  /* mellow yellow */
+    color: #6a5e00;
+}
+.tag-ready {
+    background-color: #4af6e2;  /* mellow yellow */
+    color: #1f585a;
+}
+.tag-posted{
+    background-color: #b3bdff;  /* mellow yellow */
+    color: #00416a;
+}
+.tag-low {
+    color: #a1efa1;
+}
+
+.tag-medium {
+    color: #f1dd8a;
+}
+
+.tag-high {
+    color: #f18484;
+}
+.pagination-controls {
+    position: relative;
+    display: flex;
+    width: 100%;
+    padding: 10px 0;
+    color: #000000;
+    font-family: 'Futura', sans-serif;
+    font-size: 13px;
+}
+
+.pagination-info {
+    position: absolute;
+    left: 0;
+    text-align: left;
+    padding: 0 30px;
+    margin: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.pagination-buttons {
+    width: 100%;
+    text-align: center;
+}
+
+.pagination-buttons button {
+    font-size: 13px;
+    cursor: pointer;
+    border-radius: 20px;
+    margin: 0 5px;
+}
+a:link {
+    text-decoration: none;
+    color: #189ed6;
+}
+a:hover {
+    color: hotpink;
+}
+
+body{
+    background-color: #ecf6ff;
+}
