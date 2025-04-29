@@ -18,6 +18,7 @@ const columns = [
         header: 'Status',
         cell: ({ getValue }) => {
             const status = getValue();
+            if (!status) return <span className="tag">-</span>; // <- safe fallback
             return <span className={`tag tag-${status.toLowerCase()}`}>{status}</span>;
         },
         meta: {
@@ -30,6 +31,7 @@ const columns = [
         header: 'Stage',
         cell: ({ getValue }) => {
             const stage = getValue();
+            if (!stage) return <span className="tag">-</span>;
             return <span className={`tag tag-${stage.toLowerCase()}`}>{stage}</span>;
         },
         meta: {
@@ -42,6 +44,7 @@ const columns = [
         header: 'Priority',
         cell: ({ getValue }) => {
             const priority = getValue();
+            if (!priority) return <span className="tag">-</span>;
             return <span className={`tag tag-${priority.toLowerCase()}`}>{priority}</span>;
         },
         meta: {
@@ -143,7 +146,7 @@ const columns = [
 ];
 
 const getEditorClass = (name) => {
-    if (!name) return 'editor-color-0';
+    if (!name) return 'editor-color';
     if (!(name in editorColorMap)) {
         editorColorMap[name] = nextColorIndex;
         nextColorIndex = (nextColorIndex + 1) % colorClassCount;
@@ -164,7 +167,7 @@ const formatDate = (dateStr) => {
     }).format(date);
 };
 
-function VideoTable() {
+function VideoTable({ refreshTrigger}) {
     const [videos, setVideos] = useState([]);
     const [pagination, setPagination] = useState({
         pageIndex: 0,
@@ -191,7 +194,7 @@ function VideoTable() {
                 setPageCount(response.data.page.totalPages)
                 setTotalVideos(response.data.page.totalElements);
             })
-    }, [pagination]);
+    }, [pagination, refreshTrigger]);
 
     const table = useReactTable({
         data: videos, columns,
@@ -230,7 +233,7 @@ function VideoTable() {
             </thead>
             <tbody className="table-body">
                 {table.getRowModel().rows.map(row => {
-                    const editorName = row.original.editor.name;
+                    const editorName = row.original.editor?.name || "";
                     const rowClass = getEditorClass(editorName);
 
                     return (
@@ -238,7 +241,8 @@ function VideoTable() {
                 {row.getVisibleCells().map(cell => (
                     <td
                         key={cell.id}
-                        style={{ textAlign: cell.column.columnDef.meta?.align || 'left' }}
+                        style={{ textAlign: cell.column.columnDef.meta?.align || 'left',
+                            textTransform: cell.column.id === 'compilationName' ? 'uppercase' : undefined }}
                     >
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </td>

@@ -1,11 +1,13 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Login from './Login';
 import VideoList from './VideoList';
 import axiosInstance from "./axiosInstance.js";
+import AddCompilationModal from "./AddCompilationModal.jsx";
 
 function App() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [refreshTrigger, setRefreshTrigger] = useState(0);
     // Function to check token validity
     const checkTokenValidity = () => {
         const token = localStorage.getItem('token');
@@ -25,6 +27,7 @@ function App() {
                 setIsLoggedIn(false);
                 window.location.href = '/'; // force immediate redirect
             });
+
     };
 
     useEffect(() => {
@@ -49,19 +52,31 @@ function App() {
         setIsLoggedIn(false);
     };
 
+
     return (
         <div className="app">
             {isLoggedIn ? (
                 <>
                     <div className="header">
+                        <button onClick={() => setShowAddModal(true)}
+                                className="add-compilation-button"
+                        >
+                            Add Compilation
+                        </button>
                         <h1>Production Plan App</h1>
                         <button className={"logout"} onClick={handleLogout}>Log Out</button>
                     </div>
-                    <VideoList />
+                    <VideoList refreshTrigger={refreshTrigger} />
                 </>
             ) : (
                 <Login onLoginSuccess={handleLoginSuccess} />
             )}
+            {showAddModal && (
+                <AddCompilationModal
+                    onClose={() => setShowAddModal(false)}
+                    onVideoAdded={() => setRefreshTrigger(prev => prev + 1)}
+                />
+            )}fina
         </div>
     );
 }
