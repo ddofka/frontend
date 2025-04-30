@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axiosInstance from './axiosInstance';
 import './VideoList.css';
 import {
     useReactTable,
@@ -7,6 +6,7 @@ import {
     getSortedRowModel,
     flexRender
 } from '@tanstack/react-table';
+import EditVideoModal from './EditVideoModal.jsx';
 
 const editorColorMap = {};
 let nextColorIndex = 0;
@@ -167,69 +167,62 @@ const formatDate = (dateStr) => {
     }).format(date);
 };
 
-function VideoTable({ refreshTrigger}) {
-    const [videos, setVideos] = useState([]);
-    const [pagination, setPagination] = useState({
-        pageIndex: 0,
-        pageSize: 10,
-    });
+function VideoList({ videoData = [], pageIndex = 0, pageSize = 10, setPageIndex, selectedIds = [], setSelectedIds, totalVideos = 0 }) {
+    const [selectedVideo, setSelectedVideo] = useState(null);
     const [pageCount, setPageCount] = useState(0);
-    const [totalVideos, setTotalVideos] = useState(0);
-    const emptyRowsCount = Math.max(0, pagination.pageSize - videos.length);
-    const emptyRows = Array(emptyRowsCount).fill(null);
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        const { pageIndex, pageSize } = pagination;
+        setPageCount(Math.ceil(totalVideos / pageSize));
+    }, [totalVideos, pageSize]);
 
-        if (!token) return;
+    const paginatedData = videoData.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize);
 
-        axiosInstance.get(`http://localhost:8080/api/videos?page=${pageIndex}&size=${pageSize}&sort=id,desc`, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        })
-            .then((response) => {
-                setVideos(response.data.content);
-                setPageCount(response.data.page.totalPages)
-                setTotalVideos(response.data.page.totalElements);
-            })
-    }, [pagination, refreshTrigger]);
+    const pagination = {
+        pageIndex,
+        pageSize,
+    };
+    const emptyRowsCount = Math.max(0, pageSize - paginatedData.length);
+    const emptyRows = Array(emptyRowsCount).fill(null);
+
+    const toggleVideoSelection = (id) => {
+        setSelectedIds((prev) =>
+            prev.includes(id) ? prev.filter((vid) => vid !== id) : [...prev, id]
+        );
+    };
 
     const table = useReactTable({
-        data: videos, columns,
+        data: paginatedData, columns,
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
         state: {
             pagination,
         },
-        pageCount,
+        pageCount: pageCount,
         manualPagination: true,
-        onPaginationChange: setPagination,
+        onPaginationChange: ({ pageIndex: newPageIndex }) => setPageIndex(newPageIndex),
     });
 
-    const currentPage = pagination.pageIndex;
-    const itemsPerPage = pagination.pageSize;
 
-    const highestItemOnPage = totalVideos - (currentPage * itemsPerPage);
-    const lowestItemOnPage = Math.max(1, highestItemOnPage - videos.length + 1);
+    const highestItemOnPage = pageIndex * pageSize + paginatedData.length;
+    const lowestItemOnPage = pageIndex * pageSize + 1;
 
     return (
         <>
         <div className="table-container">
-        <table className="table-content">
+        <table className="video-table table-content">
             <thead>
-            {table.getHeaderGroups().map(headerGroup => (
-                <tr key={headerGroup.id}>
-                    {headerGroup.headers.map(header => (
+            <tr>
+                <th></th>
+                {table.getHeaderGroups().map(headerGroup => (
+                    headerGroup.headers.map(header => (
                         <th key={header.id}
                             style={{ textAlign: header.column.columnDef.meta?.headerAlign || 'left' }}
                         >
                             {flexRender(header.column.columnDef.header, header.getContext())}
                         </th>
-                    ))}
-                </tr>
-            ))}
+                    ))
+                ))}
+            </tr>
             </thead>
             <tbody className="table-body">
                 {table.getRowModel().rows.map(row => {
@@ -237,7 +230,16 @@ function VideoTable({ refreshTrigger}) {
                     const rowClass = getEditorClass(editorName);
 
                     return (
-                    <tr key={row.id} className={rowClass}>
+                    <tr key={row.id} className={rowClass} onClick={() => setSelectedVideo(row.original)}>
+                        <td onClick={(e) => e.stopPropagation()}>
+                            <input
+                                type="checkbox"
+                                className="video-select-checkbox"
+                                style={{ appearance: 'checkbox', WebkitAppearance: 'checkbox', MozAppearance: 'checkbox' }}
+                                checked={!!selectedIds?.includes(row.original.id)}
+                                onChange={() => toggleVideoSelection(row.original.id)}
+                            />
+                        </td>
                 {row.getVisibleCells().map(cell => (
                     <td
                         key={cell.id}
@@ -252,30 +254,38 @@ function VideoTable({ refreshTrigger}) {
                 })}
                 {emptyRows.map((_, index) => (
                     <tr key={`empty-row-${index}`} className="empty-row">
-                        <td colSpan={columns.length}>&nbsp;</td>
+                        <td colSpan={columns.length + 1}>&nbsp;</td>
                     </tr>
                 ))}
             </tbody>
         </table>
             <div className="pagination-controls">
                 <div className="pagination-info">
-                    <p>Showing {highestItemOnPage}–{lowestItemOnPage} of {totalVideos}</p>
+                    <p>Showing {lowestItemOnPage}–{highestItemOnPage} of {totalVideos}</p>
                 </div>
 
                 <div className="pagination-buttons">
-                    <button onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
+                    <button onClick={() => setPageIndex(pageIndex - 1)} disabled={pageIndex <= 0}>
                         Previous
                     </button>
                     <span>
-                      Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+                      Page {pageIndex + 1} of {pageCount}
                     </span>
-                    <button onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+                    <button onClick={() => setPageIndex(pageIndex + 1)} disabled={pageIndex >= pageCount - 1}>
                         Next
                     </button>
                 </div>
             </div>
+            {selectedVideo && (
+                <EditVideoModal
+                    video={selectedVideo}
+                    onClose={() => setSelectedVideo(null)}
+                    onVideoUpdated={() => {}}
+                />
+            )}
         </div>
         </>
     );
 }
-export default VideoTable;
+
+export default VideoList;

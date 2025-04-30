@@ -1,0 +1,47 @@
+.test-info-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px auto;
+    border-radius: 10px;
+    box-shadow: 0 40px 0 rgb(251, 251, 251);
+    font-family: 'Futura', sans-serif;
+    font-size: 13px;
+}
+
+.test-info-table td {
+    font-weight: 500;
+}
+
+.test-info-table th {
+    font-weight: bold;
+}
+
+.test-info-table th,
+.test-info-table td {
+    text-align: left;
+    padding: 12px 15px;
+    border-left: none;
+    border-right: none;
+    background-color: white;
+    color: #1a1a1a;
+}
+
+.test-info-table tr {
+    /* Removed box-shadow to avoid illusion of extra row or footer */
+}
+
+.test-info-table thead th:first-child {
+    border-top-left-radius: 10px;
+}
+
+.test-info-table thead th:last-child {
+    border-top-right-radius: 10px;
+}
+
+.test-info-table tbody tr:last-child td:first-child {
+    border-bottom-left-radius: 10px;
+}
+
+.test-info-table tbody tr:last-child td:last-child {
+    border-bottom-right-radius: 10px;
+}
