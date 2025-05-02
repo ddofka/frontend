@@ -167,21 +167,19 @@ const formatDate = (dateStr) => {
     }).format(date);
 };
 
-function VideoList({ videoData = [], pageIndex = 0, pageSize = 10, setPageIndex, selectedIds = [], setSelectedIds, totalVideos = 0 }) {
+function VideoList({ videoData = [], pageIndex = 0, pageSize = 10, setPageIndex, selectedIds = [], setSelectedIds, totalVideos = 0,onVideoUpdated }) {
     const [selectedVideo, setSelectedVideo] = useState(null);
     const [pageCount, setPageCount] = useState(0);
 
     useEffect(() => {
-        setPageCount(Math.ceil(totalVideos / pageSize));
+        setPageCount(Math.max(1, Math.ceil(totalVideos / pageSize)));
     }, [totalVideos, pageSize]);
-
-    const paginatedData = videoData.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize);
 
     const pagination = {
         pageIndex,
         pageSize,
     };
-    const emptyRowsCount = Math.max(0, pageSize - paginatedData.length);
+    const emptyRowsCount = Math.max(0, pageSize - videoData.length);
     const emptyRows = Array(emptyRowsCount).fill(null);
 
     const toggleVideoSelection = (id) => {
@@ -191,7 +189,8 @@ function VideoList({ videoData = [], pageIndex = 0, pageSize = 10, setPageIndex,
     };
 
     const table = useReactTable({
-        data: paginatedData, columns,
+        data: videoData, // Use videoData directly, not paginatedData
+        columns,
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
         state: {
@@ -199,11 +198,16 @@ function VideoList({ videoData = [], pageIndex = 0, pageSize = 10, setPageIndex,
         },
         pageCount: pageCount,
         manualPagination: true,
-        onPaginationChange: ({ pageIndex: newPageIndex }) => setPageIndex(newPageIndex),
+        onPaginationChange: (updater) => {
+            const newPagination = typeof updater === 'function'
+                ? updater(pagination)
+                : updater;
+            setPageIndex(newPagination.pageIndex);
+        },
     });
 
 
-    const highestItemOnPage = pageIndex * pageSize + paginatedData.length;
+    const highestItemOnPage = Math.min((pageIndex + 1) * pageSize, totalVideos);
     const lowestItemOnPage = pageIndex * pageSize + 1;
 
     return (
@@ -225,34 +229,35 @@ function VideoList({ videoData = [], pageIndex = 0, pageSize = 10, setPageIndex,
             </tr>
             </thead>
             <tbody className="table-body">
-                {table.getRowModel().rows.map(row => {
-                    const editorName = row.original.editor?.name || "";
-                    const rowClass = getEditorClass(editorName);
+            {table.getRowModel().rows.map(row => {
+                const editorName = row.original?.editor?.name || "";
+                const rowClass = getEditorClass(editorName);
 
-                    return (
+                return (
                     <tr key={row.id} className={rowClass} onClick={() => setSelectedVideo(row.original)}>
                         <td onClick={(e) => e.stopPropagation()}>
                             <input
                                 type="checkbox"
                                 className="video-select-checkbox"
                                 style={{ appearance: 'checkbox', WebkitAppearance: 'checkbox', MozAppearance: 'checkbox' }}
-                                checked={!!selectedIds?.includes(row.original.id)}
+                                checked={selectedIds.includes(row.original.id)}
                                 onChange={() => toggleVideoSelection(row.original.id)}
                             />
                         </td>
-                {row.getVisibleCells().map(cell => (
-                    <td
-                        key={cell.id}
-                        style={{ textAlign: cell.column.columnDef.meta?.align || 'left',
-                            textTransform: cell.column.id === 'compilationName' ? 'uppercase' : undefined }}
-                    >
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
-                ))}
-                </tr>
+                        {row.getVisibleCells().map(cell => (
+                            <td
+                                key={cell.id}
+                                style={{ textAlign: cell.column.columnDef.meta?.align || 'left',
+                                    textTransform: cell.column.id === 'compilationName' ? 'uppercase' : undefined }}
+                            >
+                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                            </td>
+                        ))}
+                    </tr>
                 );
-                })}
-                {emptyRows.map((_, index) => (
+            })}
+
+            {emptyRows.map((_, index) => (
                     <tr key={`empty-row-${index}`} className="empty-row">
                         <td colSpan={columns.length + 1}>&nbsp;</td>
                     </tr>
@@ -280,7 +285,9 @@ function VideoList({ videoData = [], pageIndex = 0, pageSize = 10, setPageIndex,
                 <EditVideoModal
                     video={selectedVideo}
                     onClose={() => setSelectedVideo(null)}
-                    onVideoUpdated={() => {}}
+                    onVideoUpdated={() => {
+                        onVideoUpdated && onVideoUpdated();
+                    }}
                 />
             )}
         </div>

@@ -69,18 +69,27 @@ function App() {
     }, []);
 
     useEffect(() => {
-      const fetchVideos = async () => {
-        try {
-          const response = await axiosInstance.get(
-            `http://localhost:8080/api/videos?page=${pageIndex}&size=${pageSize}&sort=id,desc`
-          );
-          console.log('Fetched video data:', response.data.content);
-          setVideoData(response.data.content || []);
-          setTotalVideos(response.data.page.totalElements || 0);
-        } catch (error) {
-          console.error('Failed to fetch video data:', error);
-        }
-      };
+        const fetchVideos = async () => {
+            try {
+                setVideoData([]); // Clear previous data while loading
+                const response = await axiosInstance.get(
+                    `http://localhost:8080/api/videos?page=${pageIndex}&size=${pageSize}&sort=id,desc`
+                );
+                console.log('Fetched video data for page', pageIndex, ':', response.data);
+
+                // Make sure we're getting data for the current page
+                if (response.data && response.data.content) {
+                    setVideoData(response.data.content);
+                    setTotalVideos(response.data.page.totalElements || 0);
+                } else {
+                    console.error('Unexpected API response format:', response.data);
+                    setVideoData([]);
+                }
+            } catch (error) {
+                console.error('Failed to fetch video data:', error);
+                setVideoData([]);
+            }
+        };
 
       fetchVideos();
     }, [refreshTrigger, pageIndex, pageSize]);
@@ -122,6 +131,9 @@ function App() {
                             pageSize={pageSize}
                             setPageIndex={setPageIndex}
                             totalVideos={totalVideos}
+                            selectedIds={selectedIds}
+                            setSelectedIds={setSelectedIds}  // This was missing!
+                            onVideoUpdated={() => setRefreshTrigger(prev => prev + 1)} // Add this to refresh when videos are edited
                         />
                       <div className="test-info-wrapper">
                           <TestInformationTable selectedIds={selectedIds} videoData={videoData} />

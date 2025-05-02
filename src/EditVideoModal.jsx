@@ -121,10 +121,11 @@ function EditVideoModal({ video, onClose, onVideoUpdated }) {
       }
       console.log('PATCH payload:', payload);
       await axiosInstance.patch(`http://localhost:8080/api/videos/${video.id}`, payload);
-      onVideoUpdated();
+      onVideoUpdated(); // Make sure this line is present
       onClose();
     } catch (error) {
       console.error('Failed to update video:', error);
+      alert('Failed to update video. Please try again.');
     }
   };
 
