@@ -1,0 +1,174 @@
+.table-container {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(40px * 10 + 37px);
+}
+
+thead {
+    height: 37px;
+}
+
+tbody.table-body tr {
+    height: 40px;
+}
+.empty-row {
+    height: 40px;
+    background-color: #f6f6f6;
+}
+.empty-row td {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+.video-table th{
+    background-color: rgb(251, 251, 251);
+}
+.video-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 auto;
+    border-radius: 10px;
+    box-shadow: 0 40px 0 rgb(251, 251, 251);
+}
+.video-header {
+    text-align: center;
+    font-family: 'Futura', sans-serif;
+    -webkit-text-stroke: 1.5px black;
+    color: #ecf6ff;
+}
+.video-subheader {
+    text-align: center;
+}
+.video-table td,
+ .video-table th {
+     border-left: none !important;
+     border-right: none !important;
+     box-shadow: none !important;
+ }
+.table-content th,
+.table-content td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    border-top: none;
+    border-left: none;
+    border-right: none;
+}
+.table-content {
+    font-family: 'Futura', sans-serif;
+    font-size: 13px;
+}
+.table-body {
+    font-weight: 500; /* or bold, 500, 600, etc. */
+    font-family: "Roboto", sans-serif;
+    color: #1a1a1a; /* dark gray */
+}
+.editor-color{background-color: #f6f6f6;}
+.editor-color-0 { background-color: #E7D3F3; } /* from #F0E9F9 */
+.editor-color-1 { background-color: #DDEBFA; } /* from #F0F4FB */
+.editor-color-2 { background-color: #FFF0D1; } /* from #FFF8EB */
+.editor-color-3 { background-color: #D5F2E6; } /* from #EDF8F3 */
+.editor-color-4 { background-color: #EEDBF9; } /* from #F8F2FC */
+
+.tag {
+    padding: 0 6px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: white;
+    margin-right: -8px;
+    margin-left: -8px;
+}
+.tag-canceled {background-color: #f8bcbc; color: #842029;}
+
+.tag-prep {background-color: #dcdcdc; color: #3f3f3f;}
+
+.tag-refilm {
+    background-color: #ffd59e;  /* mellow orange */
+    color: #924c00;
+}
+
+.tag-done_filming {
+    background-color: #42d15a;  /* soft green */
+    color: #fff;
+}
+
+.tag-filming {
+    background-color: #fff7b3;  /* mellow yellow */
+    color: #6a5e00;
+}
+.tag-editing {
+    background-color: #95ddd0;  /* mellow yellow */
+    color: #fff;
+}
+.tag-testing {
+    background-color: #d1ffb3;  /* mellow yellow */
+    color: #6a5e00;
+}
+.tag-ready {
+    background-color: #4af6e2;  /* mellow yellow */
+    color: #1f585a;
+}
+.tag-posted{
+    background-color: #b3bdff;  /* mellow yellow */
+    color: #00416a;
+}
+.tag-low {
+    color: #a1efa1;
+}
+
+.tag-medium {
+    color: #f1dd8a;
+}
+
+.tag-high {
+    color: #f18484;
+}
+.pagination-controls {
+    position: relative;
+    display: flex;
+    width: 100%;
+    padding: 10px 0;
+    color: #000000;
+    font-family: 'Futura', sans-serif;
+    font-size: 13px;
+}
+
+.pagination-info {
+    position: absolute;
+    left: 0;
+    text-align: left;
+    padding: 0 30px;
+    margin: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.pagination-buttons {
+    width: 100%;
+    text-align: center;
+}
+
+.pagination-buttons button {
+    font-family: 'Futura', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    border-radius: 20px;
+    margin: 0 5px;
+}
+
+.previous{
+    border-color: transparent;
+    background-color: transparent;
+}
+
+.next{
+    background-color: transparent;
+    border-color: transparent;
+}
+
+.video-table thead th:first-child {
+    border-top-left-radius: 10px;
+}
+
+.video-table thead th:last-child {
+    border-top-right-radius: 10px;
+}

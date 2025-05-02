@@ -1,0 +1,91 @@
+.test-info-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px auto;
+    border-radius: 10px;
+    box-shadow: 0 40px 0 rgb(251, 251, 251);
+    font-family: 'Futura', sans-serif;
+    font-size: 13px;
+}
+
+.test-info-table td {
+    font-weight: 500;
+}
+
+.test-info-table th {
+    font-weight: bold;
+}
+
+.test-info-table th,
+.test-info-table td {
+    text-align: left;
+    padding: 12px 15px;
+    border-left: none;
+    border-right: none;
+    background-color: white;
+    color: #1a1a1a;
+}
+
+.test-info-table th.active-version {
+    background-color: #fff000;
+    font-weight: bold;
+    border-bottom: 2px solid black;
+}
+
+.test-info-table th.dimmed {
+    color: #a0a0a0;
+    font-weight: normal;
+    background-color: #f9f9f9;
+}
+
+.test-info-header{
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+.test-info-button {
+    background-color: black;
+    color: white;
+    font-family: 'Futura', sans-serif;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 1rem;
+}
+.test-info-button:hover {
+    background-color: rgb(255, 240, 0);
+    color: black;
+}
+
+.test-info-table tr {
+    /* Removed box-shadow to avoid illusion of extra row or footer */
+}
+
+.test-info-table td:not(:first-child),
+.test-info-table th:not(:first-child) {
+    text-align: center;
+}
+
+.test-info-table thead th:first-child {
+    border-top-left-radius: 10px;
+}
+
+.test-info-table thead th:last-child {
+    border-top-right-radius: 10px;
+}
+
+.test-info-table tbody tr:last-child td:first-child {
+    border-bottom-left-radius: 10px;
+}
+
+.test-info-table tbody tr:last-child td:last-child {
+    border-bottom-right-radius: 10px;
+}
+
+
+.test-info-table th.version-header:not(.active-version):hover {
+    background-color: #fbf7b3;
+    cursor: pointer;
+}
