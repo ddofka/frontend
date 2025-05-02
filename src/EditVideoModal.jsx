@@ -159,7 +159,7 @@ function EditVideoModal({ video, onClose, onVideoUpdated }) {
           <input type="date" value={editStart} onChange={(e) => setEditStart(e.target.value)} />
           <br/>
           <label>Release 1:</label>
-          <input type="datetime-local" value={release1} onChange={(e) => setRelease1(e.target.value)} />
+          <input type="datetime-local"  value={release1} onChange={(e) => setRelease1(e.target.value)} />
           <br/>
           <label>Release 2:</label>
           <input type="datetime-local" value={release2} onChange={(e) => setRelease2(e.target.value)} />
@@ -216,7 +216,7 @@ function EditVideoModal({ video, onClose, onVideoUpdated }) {
           <label>Comment:</label>
           <textarea value={comment} onChange={(e) => setComment(e.target.value)} />
           <br/>
-          <button type="submit">Update</button>
+          <button className="submit-button" type="submit">Update</button>
         </form>
         <button onClick={handleDelete} className="close-button">Delete</button>
         <button onClick={onClose} className="close-button">Close</button>

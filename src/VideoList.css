@@ -148,11 +148,23 @@ tbody.table-body tr {
 }
 
 .pagination-buttons button {
+    font-family: 'Futura', sans-serif;
     font-size: 13px;
     cursor: pointer;
     border-radius: 20px;
     margin: 0 5px;
 }
+
+.previous{
+    border-color: transparent;
+    background-color: transparent;
+}
+
+.next{
+    background-color: transparent;
+    border-color: transparent;
+}
+
 .video-table thead th:first-child {
     border-top-left-radius: 10px;
 }

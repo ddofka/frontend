@@ -1,15 +1,28 @@
-import React from 'react';
+import React, { useState} from 'react';
+import AddTestInfo from './AddTestInfo';
 import './TestInfo.css';
 
-function TestInformationTable({ selectedIds = [], videoData = [] }) {
-  // If we have selectedIds, filter to just those videos
-  // Otherwise show all videos
-  const filteredData = selectedIds.length > 0
-      ? videoData.filter(video => selectedIds.includes(video.id))
-      : videoData;
+function TestInformationTable({ selectedIds = [], videoData = [], refreshData }) {
+  const [showAddTestInfoModal, setShowAddTestInfoModal] = useState(false);
+  const [activeVersion, setActiveVersion] = useState("V1");
+  const retentionOptions = ["3s", "15s", "30s", "45s"];
+
+  // Use exact same data as VideoList - show either selected videos or display the current page of videos
+  const filteredData = Array.isArray(videoData)
+      ? (selectedIds.length > 0
+          ? videoData.filter(video => selectedIds.includes(video.id))
+          : videoData)
+      : [];
+
+  console.log("Filtered data for TestInformationTable:", filteredData);
 
   return (
       <div className="test-info-container">
+        <div className="test-info-header">
+          <button className="test-info-button" onClick={() => setShowAddTestInfoModal(true)}>
+            Test Information - Add/Update/Clear
+          </button>
+        </div>
         {filteredData.length === 0 ? (
             <div className="test-info-empty">
               {selectedIds.length > 0
@@ -20,49 +33,82 @@ function TestInformationTable({ selectedIds = [], videoData = [] }) {
             <table className="test-info-table">
               <thead>
               <tr>
-                <th>Compilation</th>
-                <th>V1</th>
-                <th>V2</th>
-                <th>V3</th>
-                <th>V4</th>
-                <th>V5</th>
+                <th>Compilation Name</th>
+                {["V1", "V2", "V3", "V4", "V5"].map((v) => (
+                    <th
+                        key={v}
+                        className={`cursor-pointer version-header ${activeVersion === v ? "active-version" : "dimmed"}`}
+                        onClick={() => setActiveVersion(v)}
+                    >
+                      {v}
+                    </th>
+                ))}
+              </tr>
+              <tr>
+                <th>Retention Time</th>
+                {retentionOptions.map((opt) =>
+                    <th key={opt}>{opt}</th>
+                )}
+                <th>Winning Version</th>
               </tr>
               </thead>
               <tbody>
-              {filteredData
-                  .filter(video => video && video.id && video.compilationName)
-                  .map((video) => {
-                    const mapped = {
-                      V1: '-',
-                      V2: '-',
-                      V3: '-',
-                      V4: '-',
-                      V5: '-',
-                    };
+              {filteredData.map((video) => {
+                const mapped = {
+                  compilationName: video.compilationName,
+                  versions: {
+                    V1: {},
+                    V2: {},
+                    V3: {},
+                    V4: {},
+                    V5: {},
+                  },
+                };
 
-                    // Safely handle tests array
-                    if (Array.isArray(video.tests)) {
-                      video.tests.forEach((test) => {
-                        if (test && Object.prototype.hasOwnProperty.call(mapped, test.version)) {
-                          mapped[test.version] = test.retentionValue;
-                        }
-                      });
+                if (Array.isArray(video.tests)) {
+                  video.tests.forEach((test) => {
+                    if (
+                        test &&
+                        test.version &&
+                        mapped.versions[test.version] !== undefined &&
+                        test.retentionTime
+                    ) {
+                      mapped.versions[test.version][test.retentionTime] = test.retentionValue;
                     }
+                  });
+                }
 
-                    return (
-                        <tr key={video.id}>
-                          <td>{video.compilationName}</td>
-                          <td>{mapped.V1}</td>
-                          <td>{mapped.V2}</td>
-                          <td>{mapped.V3}</td>
-                          <td>{mapped.V4}</td>
-                          <td>{mapped.V5}</td>
-                        </tr>
-                    );
-                  })}
+                let winningVersion = "-";
+                let bestValue = -Infinity;
+                ["V1", "V2", "V3", "V4", "V5"].forEach((v) => {
+                  const val = mapped.versions[v]["30s"];
+                  if (typeof val === "number" && val > bestValue) {
+                    bestValue = val;
+                    winningVersion = v;
+                  }
+                });
+
+                return (
+                    <tr key={video.id}>
+                      <td>{mapped.compilationName}</td>
+                      {retentionOptions.map((opt) => (
+                          <td key={opt}>
+                            {mapped.versions?.[activeVersion]?.[opt] ?? "-"}
+                          </td>
+                      ))}
+                      <td>{winningVersion}</td>
+                    </tr>
+                );
+              })}
               </tbody>
             </table>
         )}
+        <AddTestInfo
+            isOpen={showAddTestInfoModal}
+            onClose={() => setShowAddTestInfoModal(false)}
+            videoData={videoData}
+            refreshData={refreshData}
+        />
       </div>
   );
 }

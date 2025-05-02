@@ -115,7 +115,7 @@ function AddCompilationModal({ onClose, onVideoAdded }) {
                         onChange={(e) => setComment(e.target.value)}
                     />
                     <br/>
-                    <button type="submit">Submit</button>
+                    <button className="submit-button" type="submit">Submit</button>
                 </form>
                 <button onClick={onClose} className="close-button">Close</button>
             </div>

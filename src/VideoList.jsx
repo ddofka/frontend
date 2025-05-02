@@ -270,13 +270,13 @@ function VideoList({ videoData = [], pageIndex = 0, pageSize = 10, setPageIndex,
                 </div>
 
                 <div className="pagination-buttons">
-                    <button onClick={() => setPageIndex(pageIndex - 1)} disabled={pageIndex <= 0}>
+                    <button onClick={() => setPageIndex(pageIndex - 1)} disabled={pageIndex <= 0} className="previous">
                         Previous
                     </button>
                     <span>
                       Page {pageIndex + 1} of {pageCount}
                     </span>
-                    <button onClick={() => setPageIndex(pageIndex + 1)} disabled={pageIndex >= pageCount - 1}>
+                    <button onClick={() => setPageIndex(pageIndex + 1)} disabled={pageIndex >= pageCount - 1} className="next">
                         Next
                     </button>
                 </div>
